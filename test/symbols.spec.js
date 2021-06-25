@@ -1,18 +1,12 @@
 "use strict";
 const Assembler = require("../src/asm");
-const { Sink } = require("./utils");
+const { symbols } = require("./utils");
 
 describe("symbols", () => {
   it("generates short", () => {
-    const a = new Assembler(`
-.orig x3000
+    expect(symbols(`
 LOOP
-BR LOOP
-.end`);
-    const s = new Sink();
-    a.symbols(s);
-    s.end();
-    expect(s.read().toString()).toBe(`\
+BR LOOP`)).toBe(`\
 // Symbol table
 // Scope level 0:
 //\tSymbol Name  Page Address
@@ -23,17 +17,9 @@ BR LOOP
   });
 
   it("generates long", () => {
-    const a = new Assembler(`
-.orig x3000
+    expect(symbols(`
 LONGER_SYMBOL_NAME
-BR LONGER_SYMBOL_NAME
-.end`);
-    const s = new Sink();
-    a.symbols(s);
-    s.end();
-
-    // Check alignment
-    expect(s.read().toString()).toBe(`\
+BR LONGER_SYMBOL_NAME`)).toBe(`\
 // Symbol table
 // Scope level 0:
 //\tSymbol Name         Page Address
@@ -41,5 +27,9 @@ BR LONGER_SYMBOL_NAME
 //\tLONGER_SYMBOL_NAME  3000
 
 `);
+  });
+
+  it("detects dups", () => {
+    expect(() => { symbols("LOOP\nLOOP:\n"); }).toThrow();
   });
 });

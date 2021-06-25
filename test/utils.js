@@ -22,7 +22,19 @@ ${code}
   return s.read().toString("hex");
 }
 
+function symbols(code, file = "test") {
+  const a = new Assembler(`
+.orig x3000
+${code}
+.end`, file);
+  const s = new Sink();
+  a.symbols(s);
+  s.end();
+  return s.read().toString();
+}
+
 module.exports = {
   Sink,
   asm,
+  symbols,
 };

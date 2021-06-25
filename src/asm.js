@@ -8,13 +8,13 @@ function chop(n, bits) {
   const max = (1 << (bits - 1)) - 1;
   if (n >= 0) {
     if (n > max) {
-      throw new Error(`Invalid direct number ${n} > ${max}`);
+      throw new RangeError(`Invalid direct number ${n} > ${max}`);
     }
     return n & max;
   }
   const min = -1 << (bits - 1);
   if (n < min) {
-    throw new Error(`Invalid direct number ${n} < ${min}`);
+    throw new RangeError(`Invalid direct number ${n} < ${min}`);
   }
   return (n & max) | (max + 1);
 }
@@ -49,64 +49,91 @@ class Assembler {
     if (pos === undefined) {
       throw new Error(`Unknown symbol "${i.label}"`);
     }
-    return chop(pos - i.offset - 1, bits);
+    return chop(pos - i.pc - 1, bits);
   }
 
   object(stream) {
-    function wordOut(word) {
+    function wordOut(opcode, ...others) {
       const buf = Buffer.alloc(2);
-      buf.writeUint16BE(word);
+      let code = opcode << 12;
+      for (const o of others) {
+        code |= o;
+      }
+      buf.writeUint16BE(code);
       stream.write(buf);
     }
 
-    wordOut(this.ast.orig);
+    wordOut(0, this.ast.orig);
     for (const i of this.ast.instructions) {
       switch (i.op) {
         case "ADD": {
-          let code = (0b0001 << 12) | (i.dr << 9) | (i.sr1 << 6);
-          if ("direct" in i) {
-            code |= (1 << 5) | chop(i.direct, 5);
-          } else {
-            code |= i.sr2;
-          }
-          wordOut(code);
+          const code = ("direct" in i)
+            ? (1 << 5) | chop(i.direct, 5)
+            : i.sr2;
+          wordOut(0b0001, i.dr << 9, i.sr1 << 6, code);
           break;
         }
         case "AND": {
-          let code = (0b0101 << 12) | (i.dr << 9) | (i.sr1 << 6);
-          if ("direct" in i) {
-            code |= (1 << 5) | chop(i.direct, 5);
+          const code = ("direct" in i)
+            ? (1 << 5) | chop(i.direct, 5)
+            : i.sr2;
+          wordOut(0b0101, i.dr << 9, i.sr1 << 6, code);
+          break;
+        }
+        case "BLKW":
+          stream.write(Buffer.alloc(i.size * 2));
+          break;
+        case "BR":
+          wordOut(0b0000, i.nzp << 9, this.labelOffset(i));
+          break;
+        case "FILL":
+          if (typeof i.fill === "number") {
+            // Odd behavior, but if positive, unsigned.  If negative, signed.
+            wordOut(0, (i.fill >= 0) ? i.fill : chop(i.fill, 16));
           } else {
-            code |= i.sr2;
+            wordOut(0, this.ast.symbols[i.fill].pc);
           }
-          wordOut(code);
           break;
-        }
-        case "BLKW": {
-          const buf = Buffer.alloc(i.size * 2);
-          stream.write(buf);
+        case "JMP":
+          wordOut(0b1100, i.br << 6);
           break;
-        }
-        case "BR": {
-          // Opcode 0
-          const code = i.nzp << 9 | this.labelOffset(i);
-          wordOut(code);
+        case "JSR":
+          wordOut(0b0100, 1 << 11, this.labelOffset(i, 11));
           break;
-        }
+        case "JSRR":
+          wordOut(0b0100, i.br << 6);
+          break;
         case "LABEL":
           // No-op
           break;
-        case "LD": {
-          const code = (0b0010 << 12) | (i.dr << 9) | this.labelOffset(i);
-          wordOut(code);
+        case "LD":
+          wordOut(0b0010, i.dr << 9, this.labelOffset(i));
           break;
-        }
-        case "ST": {
-          const code = (0b0011 << 12) | (i.sr << 9) | this.labelOffset(i);
-          wordOut(code);
+        case "LDI":
+          wordOut(0b1010, i.dr << 9, this.labelOffset(i));
           break;
-        }
-        case "STRINGZ": {
+        case "LDR":
+          wordOut(0b0110, i.dr << 9, i.br << 6, chop(i.direct, 6));
+          break;
+        case "LEA":
+          wordOut(0b1110, i.dr << 9, this.labelOffset(i));
+          break;
+        case "NOT":
+          wordOut(0b1001, i.dr << 9, i.sr << 6, 0x3f);
+          break;
+        case "RTI":
+          wordOut(0b1000);
+          break;
+        case "ST":
+          wordOut(0b0011, i.sr << 9, this.labelOffset(i));
+          break;
+        case "STI":
+          wordOut(0b1011, i.sr << 9, this.labelOffset(i));
+          break;
+        case "STR":
+          wordOut(0b0111, i.sr << 9, i.br << 6, chop(i.direct, 6));
+          break;
+        case "STRINGZ":
           for (let c = 0; c < i.string.length; c++) {
             const code = i.string.charCodeAt(c);
             // Chars are little-endian
@@ -114,14 +141,11 @@ class Assembler {
             buf.writeUint16LE(code);
             stream.write(buf);
           }
-          wordOut(0);
+          wordOut(0, 0);
           break;
-        }
-        case "TRAP": {
-          const code = (0b1111 << 12) | chop(i.direct, 8);
-          wordOut(code);
+        case "TRAP":
+          wordOut(0b1111, chop(i.direct, 8));
           break;
-        }
         default:
           throw new Error(`Unknown opcode "${i.op}":`, i);
       }
