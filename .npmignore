@@ -1,0 +1,7 @@
+src/lc3.peggy
+jest.config.js
+node_modules
+coverage/
+test/
+.editorconfig
+.eslintrc.js

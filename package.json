@@ -1,0 +1,28 @@
+{
+  "name": "lc3asm",
+  "version": "0.0.0",
+  "description": "",
+  "main": "src/asm.js",
+  "bin": {
+    "lc3asm": "bin/lc3asm.js"
+  },
+  "scripts": {
+    "parser": "peggy src/lc3.peggy",
+    "pretest": "npm run parser",
+    "test": "jest",
+    "lint": "eslint . --ext js"
+  },
+  "keywords": [],
+  "author": "Joe Hildebrand <joe-github@cursive.net>",
+  "license": "MIT",
+  "devDependencies": {
+    "@peggyjs/eslint-config": "^0.0.2",
+    "eslint": "^7.29.0",
+    "eslint-plugin-jest": "^24.3.6",
+    "jest": "^27.0.5",
+    "peggy": "^1.2.0"
+  },
+  "engine": {
+    "node": ">=12.22"
+  }
+}
