@@ -37,6 +37,10 @@ describe("parse errors", () => {
     expect(errParse(".orig")).toBeTruthy();
     expect(errParse(".orig ")).toBeTruthy();
     expect(errParse(".orig 0")).toBeTruthy();
+    expect(errParse(".orig b")).toBeTruthy();
+    expect(errParse(".orig b2")).toBeTruthy();
+    expect(errParse(".orig b-")).toBeTruthy();
+    expect(errParse(".orig b-2")).toBeTruthy();
 
     expect(errParse(".orig 0\n.blkw")).toBeTruthy();
 
@@ -174,14 +178,23 @@ describe("parse errors", () => {
     expect(errParse(".orig 0\nR1")).toBeTruthy();
     expect(errParse(".orig 0\nBR R1\n.end")).toBeTruthy();
     expect(errParse(";")).toBeTruthy();
+    expect(errParse("")).toBeTruthy();
+    expect(errParse(".orig 0\n:")).toBeTruthy();
+
+    expect(errParse(".orig 0\n.STRINGZ .")).toBeTruthy();
+    expect(errParse('.orig 0\n.STRINGZ "\\s"')).toBeTruthy();
+    expect(errParse('.orig 0\n.STRINGZ "\\u"')).toBeTruthy();
+    expect(errParse('.orig 0\n.STRINGZ "\\u0"')).toBeTruthy();
+    expect(errParse('.orig 0\n.STRINGZ "\\u01"')).toBeTruthy();
+    expect(errParse('.orig 0\n.STRINGZ "\\u012"')).toBeTruthy();
   });
 });
 
 describe("parse edges", () => {
   it("has edge cases", () => {
     expect(parse(`
-.orig 0
-.FILL 0 ; comment
+.orig  0
+.FILL 0 \t ; comment
 .end
 ; end comment
 `)).toBeTruthy();
