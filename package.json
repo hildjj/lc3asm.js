@@ -3,17 +3,24 @@
   "version": "0.0.0",
   "description": "",
   "main": "src/asm.js",
+  "type": "module",
   "bin": {
     "lc3asm": "bin/lc3asm.js"
   },
   "scripts": {
-    "parser": "peggy src/lc3.peggy",
+    "parser": "peggy --format es src/lc3.peggy",
     "pretest": "npm run parser",
     "test": "jest",
     "lint": "eslint . --ext js"
   },
-  "keywords": [],
+  "keywords": [
+    "lc3",
+    "lc-3",
+    "assembler",
+    "little computer"
+  ],
   "author": "Joe Hildebrand <joe-github@cursive.net>",
+  "repository": "hildjj/lc3asm.js",
   "license": "MIT",
   "devDependencies": {
     "@peggyjs/eslint-config": "^0.0.2",

@@ -1,6 +1,4 @@
-"use strict";
-const Assembler = require("../src/asm");
-const { symbols } = require("./utils");
+import { symbols } from "./utils.js";
 
 describe("symbols", () => {
   it("generates short", () => {

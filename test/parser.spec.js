@@ -1,6 +1,5 @@
-"use strict";
-
-const { parse } = require("../src/lc3");
+import { describe, expect, it } from "@jest/globals";
+import { parse } from "../src/lc3.js";
 
 function errParse(txt, grammarSource, opts = {}) {
   try {

@@ -1,16 +1,14 @@
-"use strict";
+import Assembler from "../src/asm.js";
+import { Transform } from "stream";
 
-const Assembler = require("../src/asm");
-const { Transform } = require("stream");
-
-class Sink extends Transform {
+export class Sink extends Transform {
   _transform(chunk, enc, cb) {
     this.push(chunk);
     cb();
   }
 }
 
-function asm(code, file = "test") {
+export function asm(code, file = "test") {
   const a = new Assembler(`
 .orig #0
 ${code}
@@ -22,7 +20,7 @@ ${code}
   return s.read().toString("hex");
 }
 
-function symbols(code, file = "test") {
+export function symbols(code, file = "test") {
   const a = new Assembler(`
 .orig x3000
 ${code}
@@ -32,9 +30,3 @@ ${code}
   s.end();
   return s.read().toString();
 }
-
-module.exports = {
-  Sink,
-  asm,
-  symbols,
-};

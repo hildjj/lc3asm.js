@@ -1,7 +1,5 @@
-"use strict";
-
-const Assembler = require("../src/asm");
-const { asm, Sink } = require("./utils");
+import { Sink, asm } from "./utils.js";
+import Assembler from "../src/asm.js";
 
 describe("parses", () => {
   it("errors", () => {

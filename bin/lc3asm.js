@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 
-"use strict";
-const fs = require("fs");
-const path = require("path");
-const Assembler = require("../src/asm");
+import Assembler from "../src/asm.js";
+import fs from "fs";
+import path from "path";
 
 const f = process.argv[2];
 if (!f) {

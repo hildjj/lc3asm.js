@@ -1,6 +1,4 @@
-"use strict";
-
-module.exports = {
+export default {
   "collectCoverage": true,
   "coverageReporters": ["lcov"],
   "roots": [

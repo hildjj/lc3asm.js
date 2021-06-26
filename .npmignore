@@ -5,3 +5,6 @@ coverage/
 test/
 .editorconfig
 .eslintrc.js
+.vscode/
+examples/
+.eslintrc.json

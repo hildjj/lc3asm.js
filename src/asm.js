@@ -1,6 +1,4 @@
-"use strict";
-
-const { parse } = require("./lc3");
+import { parse } from "./lc3.js";
 
 const snLen = "Symbol Name".length;
 
@@ -19,7 +17,7 @@ function chop(n, bits) {
   return (n & max) | (max + 1);
 }
 
-class Assembler {
+export default class Assembler {
   constructor(src, filename) {
     this.src = src;
     this.filename = filename;
@@ -152,5 +150,3 @@ class Assembler {
     }
   }
 }
-
-module.exports = Assembler;
