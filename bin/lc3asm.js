@@ -18,15 +18,13 @@ try {
   const out = path.parse(path.resolve(process.cwd(), f));
   delete out.base;
 
+  const syms = asm.symbols();
   out.ext = ".sym";
-  const syms = fs.createWriteStream(path.format(out));
-  asm.symbols(syms);
-  syms.close();
+  fs.writeFileSync(path.format(out), syms, "utf8");
 
+  const obj = asm.object();
   out.ext = ".obj";
-  const obj = fs.createWriteStream(path.format(out));
-  asm.object(obj);
-  obj.close();
+  fs.writeFileSync(path.format(out), obj);
 } catch (e) {
   if (e.format) {
     console.error(e.format([{

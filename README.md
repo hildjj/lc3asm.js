@@ -24,10 +24,21 @@ import Assembler from "lc3asm";
 const asm = new Assembler(`
 .orig 0
 .fill 0
-.end`, "filename");
+.end`, "filename"); // May throw a Peggy syntax error
 
-asm.symbols(stream);
-asm.object(stream);
+asm.symbols(); // Returns a string
+asm.object(); // Returns a Uint8Array
+```
+
+Syntax errors have a `format()` function that will generate nice output:
+
+```js
+catch (e) {
+  if (typeof e.format === "function") {
+    console.error(e.format([{
+      source, // must match what was passed to the Assembler constructor
+      text,   // The text associated with that file
+    }]));
 ```
 
 [![Node.js CI](https://github.com/hildjj/lc3asm.js/actions/workflows/node.js.yml/badge.svg)](https://github.com/hildjj/lc3asm.js/actions/workflows/node.js.yml)

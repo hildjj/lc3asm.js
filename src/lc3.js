@@ -295,7 +295,7 @@ function peg$parse(input, options) {
   var peg$e62 = peg$literalExpectation("\n", false);
 
   var peg$f0 = function(lines) {
-    return {orig, symbols, instructions:lines.filter(x => x)}
+    return {orig, symbols, end: counter, instructions:lines.filter(x => x)}
   };
   var peg$f1 = function() { return };
   var peg$f2 = function(d) { counter = orig = d; };
