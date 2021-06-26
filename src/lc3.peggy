@@ -41,7 +41,7 @@ const symbols = {};
 }
 
 file = commentline* orig lines:line* end commentline* {
-  return {orig, symbols, instructions:lines.filter(x => x)}
+  return {orig, symbols, end: counter, instructions:lines.filter(x => x)}
 }
 
 line

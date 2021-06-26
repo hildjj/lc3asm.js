@@ -1,5 +1,6 @@
-import { Sink, asm } from "./utils.js";
+import { describe, expect, it } from "@jest/globals";
 import Assembler from "../src/asm.js";
+import { asm } from "./utils.js";
 
 describe("parses", () => {
   it("errors", () => {
@@ -89,13 +90,13 @@ describe("opcodes", () => {
   it(".STRINGZ", () => {
     // Note: lc3as only writes one zero byte after the string,
     // which seems like a bug since it mis-aligns everything that follows.
-    expect(asm('.STRINGZ "foo"')).toBe("66006f006f000000");
+    expect(asm('.STRINGZ "foo"')).toBe("0066006f006f0000");
     expect(asm('.STRINGZ ""')).toBe("0000");
-    expect(asm('.STRINGZ "\\""')).toBe("22000000");
-    expect(asm('.STRINGZ "\\\\"')).toBe("5c000000");
-    expect(asm('.STRINGZ "\\/"')).toBe("2f000000");
-    expect(asm('.STRINGZ "\\b\\f\\n\\r\\t"')).toBe("08000c000a000d0009000000");
-    expect(asm('.STRINGZ "\\u1234"')).toBe("34120000");
+    expect(asm('.STRINGZ "\\""')).toBe("00220000");
+    expect(asm('.STRINGZ "\\\\"')).toBe("005c0000");
+    expect(asm('.STRINGZ "\\/"')).toBe("002f0000");
+    expect(asm('.STRINGZ "\\b\\f\\n\\r\\t"')).toBe("0008000c000a000d00090000");
+    expect(asm('.STRINGZ "\\u1234"')).toBe("12340000");
   });
   it("TRAP", () => {
     expect(asm("TRAP x23")).toBe("f023");
@@ -113,6 +114,6 @@ describe("opcodes", () => {
     a.ast.instructions.push({
       op: "__INVALID_OPERATION__",
     });
-    expect(() => a.object(new Sink())).toThrow("__INVALID_OPERATION__");
+    expect(() => a.object()).toThrow("__INVALID_OPERATION__");
   });
 });

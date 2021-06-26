@@ -1,23 +1,15 @@
 import Assembler from "../src/asm.js";
-import { Transform } from "stream";
-
-export class Sink extends Transform {
-  _transform(chunk, enc, cb) {
-    this.push(chunk);
-    cb();
-  }
-}
 
 export function asm(code, file = "test") {
   const a = new Assembler(`
 .orig #0
 ${code}
 .end`, file);
-  const s = new Sink();
-  a.object(s);
-  s.end();
-  s.read(2); // The .orig bytes
-  return s.read().toString("hex");
+  const buf = a.object();
+  return Array.prototype.map.call(
+    buf.subarray(2),
+    b => b.toString(16).padStart(2, "0"),
+  ).join("");
 }
 
 export function symbols(code, file = "test") {
@@ -25,8 +17,5 @@ export function symbols(code, file = "test") {
 .orig x3000
 ${code}
 .end`, file);
-  const s = new Sink();
-  a.symbols(s);
-  s.end();
-  return s.read().toString();
+  return a.symbols();
 }
