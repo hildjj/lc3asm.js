@@ -10,7 +10,7 @@
   "scripts": {
     "parser": "peggy --format es src/lc3.peggy",
     "pretest": "npm run parser",
-    "test": "jest",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "lint": "eslint . --ext js"
   },
   "keywords": [
