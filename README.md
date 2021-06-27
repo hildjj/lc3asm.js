@@ -11,7 +11,7 @@ $ npm install lc3asm.js
 ## Running
 
 ```sh
-$ lc3asm.js <inputfile>.asm
+$ lc3asm <inputfile>.asm
 ```
 
 This will generate `inputfile.obj` and `inputfile.sym` with the resulting object code and symbols respectively.
