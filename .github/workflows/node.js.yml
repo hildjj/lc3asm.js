@@ -13,7 +13,9 @@ jobs:
     strategy:
       matrix:
         node-version: [12.x, 14.x, 16.x]
-
+    env:
+      OS: ${{ matrix.os }}
+      NODE: ${{ matrix.node-version }}
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
@@ -23,27 +25,12 @@ jobs:
       - uses: c-hive/gha-npm-cache@v1
       - run: npm ci
       - run: npm test
-      - name: Store coverage
-        uses: actions/upload-artifact@v2
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
         with:
-          name: lcov-${{ matrix.node-version }}.info
-          path: coverage/lcov.info
+          files: coverage/lcov.info
+          env_vars: OS,NODE
+          name: codecov-umbrella
+          fail_ci_if_error: true
+          verbose: true
 
-  publish:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js 16.x
-        uses: actions/setup-node@v2
-        with:
-          node-version: 16.x
-      - name: Retrieve coverage
-        uses: actions/download-artifact@v2
-      - name: Publish code coverage
-        uses: paambaati/codeclimate-action@v2.7.5
-        env:
-          CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
-        with:
-          coverageLocations: lcov-*.info/lcov.info:lcov
-          debug: true
