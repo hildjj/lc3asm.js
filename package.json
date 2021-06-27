@@ -1,6 +1,6 @@
 {
   "name": "lc3asm",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "",
   "main": "src/asm.js",
   "type": "module",
