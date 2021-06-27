@@ -2,6 +2,77 @@
 //
 // https://peggyjs.org/
 
+
+/**
+ * @typedef Instruction - A single instruction or pseudo-operation
+ * @type {object}
+ * @property {string} op - The name of the operation.  Uppercase, leading
+ *   periond removed for pseudo-ops.
+ * @property {number} pc - The program counter where this op goes
+ * @property {number} [size = 1] - The size in words that this op takes up
+ * @property {string} [_] - The label for this op, if it exists
+ * @property {number|string} [fill] - If the op is `FILL`, the number or label name.
+ *   If a number, can be signed or unsigned.
+ * @property {string} [string] - If the op is `STRINGZ` the string (no null added).
+ * @property {number} [br] - Base register
+ * @property {number} [dr] - Destination register
+ * @property {number} [sr] - Source register
+ * @property {number} [sr1] - First source register
+ * @property {number} [sr2] - Second source register
+ * @property {number} [direct] - A direct value, signed
+ * @property {number} [nzp] - If the op is `BR`, a three-bit number for the nzp flags
+ * @property {string} [label] - An operand label name
+ */
+
+/**
+ * @typedef AST
+ * @type {object}
+ * @property {number} [orig] - The origin offset to prefix onto generated code
+ * @property {Object.<String,number>} [symbols] - A mapping from symbol names to their
+ *   program counter offsets, measured in 16-bit words.
+ * @property {number} [end] - The ending program counter offset, measured in
+ *   16-bit words.
+ * @property {Instruction[]} [instructions] - The instructions that were parsed.
+ */
+
+// @ts-nocheck
+const opcodes = [
+  "ADD", "AND",
+  "BR", "BRN", "BRZ", "BRP", "BRNZ", "BRNP", "BRZP", "BRNZP",
+  "JMP", "JSR", "JSRR",  "RET", "RTI",
+  "LD", "LDI", "LDR",
+  "LEA",
+  "NOT",
+  "ST", "STI", "STR",
+  "TRAP",
+];
+
+const traps = [
+  "GETC",
+  "OUT",
+  "PUTS",
+  "IN",
+  "PUTSP",
+  "HALT",
+];
+
+const memops = [
+  ".BLKW",
+  ".FILL",
+  ".STRINGZ",
+]
+
+const REGISTER = /^[rR][0-7]$/;
+
+function validID(id) {
+  const up = id.toUpperCase();
+  return !opcodes.includes(up) &&
+    !traps.includes(up) &&
+    !memops.includes(up) &&
+    !REGISTER.test(id);
+}
+
+
 function peg$subclass(child, parent) {
   function C() { this.constructor = child; }
   C.prototype = parent.prototype;
@@ -295,7 +366,9 @@ function peg$parse(input, options) {
   var peg$e62 = peg$literalExpectation("\n", false);
 
   var peg$f0 = function(lines) {
-    return {orig, symbols, end: counter, instructions:lines.filter(x => x)}
+    /** @type AST */
+    const res = {orig, symbols, end: counter, instructions:lines.filter(x => x)};
+    return res;
   };
   var peg$f1 = function() { return };
   var peg$f2 = function(d) { counter = orig = d; };
@@ -2771,42 +2844,6 @@ function peg$parse(input, options) {
   }
 
 
-  const opcodes = [
-    "ADD", "AND",
-    "BR", "BRN", "BRZ", "BRP", "BRNZ", "BRNP", "BRZP", "BRNZP",
-    "JMP", "JSR", "JSRR",  "RET", "RTI",
-    "LD", "LDI", "LDR",
-    "LEA",
-    "NOT",
-    "ST", "STI", "STR",
-    "TRAP",
-  ];
-
-  const traps = [
-    "GETC",
-    "OUT",
-    "PUTS",
-    "IN",
-    "PUTSP",
-    "HALT",
-  ];
-
-  const memops = [
-    ".BLKW",
-    ".FILL",
-    ".STRINGZ",
-  ]
-
-  const REGISTER = /^[rR][0-7]$/;
-
-  function validID(id) {
-    const up = id.toUpperCase();
-    return !opcodes.includes(up) &&
-      !traps.includes(up) &&
-      !memops.includes(up) &&
-      !REGISTER.test(id);
-  }
-
   let orig = null;
   let counter = null;
   const symbols = {};
@@ -2815,7 +2852,7 @@ function peg$parse(input, options) {
   peg$result = peg$startRuleFunction();
 
   if (peg$result !== peg$FAILED && peg$currPos === input.length) {
-    return peg$result;
+    return /** @type AST */ peg$result;
   } else {
     if (peg$result !== peg$FAILED && peg$currPos < input.length) {
       peg$fail(peg$endExpectation());

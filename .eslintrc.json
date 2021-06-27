@@ -6,6 +6,7 @@
     "sourceType": "module"
   },
   "ignorePatterns": [
-    "src/lc3.js"
+    "src/lc3.js",
+    "types/"
   ]
 }
