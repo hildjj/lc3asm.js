@@ -42,3 +42,4 @@ catch (e) {
 ```
 
 [![Node.js CI](https://github.com/hildjj/lc3asm.js/actions/workflows/node.js.yml/badge.svg)](https://github.com/hildjj/lc3asm.js/actions/workflows/node.js.yml)
+[![codecov](https://codecov.io/gh/hildjj/lc3asm.js/branch/main/graph/badge.svg?token=684YVFGCPI)](https://codecov.io/gh/hildjj/lc3asm.js)
