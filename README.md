@@ -1,11 +1,12 @@
 # lc3asm.js
 
-An assembler for Little Computer 3 ([LC-3](https://en.wikipedia.org/wiki/Little_Computer_3)).
+An assembler for Little Computer 3
+([LC-3](https://en.wikipedia.org/wiki/Little_Computer_3)).
 
 ## Installation
 
 ```sh
-$ npm install lc3asm.js
+$ npm install lc3asm
 ```
 
 ## Running
@@ -14,7 +15,8 @@ $ npm install lc3asm.js
 $ lc3asm <inputfile>.asm
 ```
 
-This will generate `inputfile.obj` and `inputfile.sym` with the resulting object code and symbols respectively.
+This will generate `inputfile.obj` and `inputfile.sym` with the resulting
+object code and symbols respectively.
 
 ## API
 
@@ -27,7 +29,7 @@ const asm = new Assembler(`
 .end`, "filename"); // May throw a Peggy syntax error
 
 asm.symbols(); // Returns a string
-asm.object(); // Returns a Uint8Array
+asm.object();  // Returns a Uint8Array
 ```
 
 Syntax errors have a `format()` function that will generate nice output:
