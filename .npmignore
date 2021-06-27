@@ -8,3 +8,5 @@ test/
 .vscode/
 examples/
 .eslintrc.json
+tsconfig.json
+.github/
